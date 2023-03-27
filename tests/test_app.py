@@ -15,13 +15,10 @@ class TestApp(TestCase):
     Test class for Dataproc Pyspark job entrypoint execution
     """
 
-    
-
     def test_app_empty_config(self):
         """
         Test app entrypoint execution with empty config file
         """
-
         runtimeContext = MagicMock()
         config = MagicMock()
         app_main = Main()
@@ -39,7 +36,7 @@ class TestApp(TestCase):
             with patch("exampleenginepythonqiyhbwvw.app.dataproc_dataflow"):
                 ret_code = app_main.main(runtimeContext)
         else:
-            with patch("exampleenginepythonqiyhbwvw.app.DataprocExperiment"):
+            with patch("exampleenginepythonqiyhbwvw.experiment.DataprocExperiment.run", return_value=None):
                 ret_code = app_main.main(runtimeContext)
 
         self.assertEqual(ret_code, 0)
@@ -70,7 +67,7 @@ class TestApp(TestCase):
             with patch("exampleenginepythonqiyhbwvw.app.dataproc_dataflow"):
                 ret_code = app_main.main(runtimeContext)
         else:
-            with patch("exampleenginepythonqiyhbwvw.app.DataprocExperiment"):
+            with patch("exampleenginepythonqiyhbwvw.experiment.DataprocExperiment.run", return_value=None):
                 ret_code = app_main.main(runtimeContext)
 
         self.assertEqual(ret_code, 0)

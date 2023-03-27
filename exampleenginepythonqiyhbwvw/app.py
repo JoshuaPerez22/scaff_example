@@ -1,12 +1,13 @@
 import os
+from dataproc_sdk import DatioPysparkSession
 
-os.environ["ENMA_CONFIG_PATH"] = os.path.join(
-    os.path.abspath(os.path.dirname(__file__)), ".sandbox"
-)
+from exampleenginepythonqiyhbwvw.config import get_params_from_runtime
+from exampleenginepythonqiyhbwvw.io import init_values
+
+os.environ["ENMA_CONFIG_PATH"] = os.path.join(os.path.abspath(os.path.dirname(__file__)), ".sandbox")
+
 from py4j.java_gateway import JavaObject
 from dataproc_sdk.dataproc_sdk_utils.logging import get_user_logger
-from exampleenginepythonqiyhbwvw.config import get_params_from_runtime
-
 
 if os.path.isfile(os.path.join(os.path.dirname(__file__), "dataflow.py")):
     from exampleenginepythonqiyhbwvw.dataflow import dataproc_dataflow  # noqa: E402
@@ -33,8 +34,6 @@ class Main:
         ret_code = 0
         parameters = {}
 
-        # PART 1 - READ FROM CONFIGURATION
-        # Reading config file for input and output paths
         try:
             config = runtimeContext.getConfig()
             if not config.isEmpty():
@@ -43,8 +42,8 @@ class Main:
         except Exception as e:
             self.__logger.error(e)
             return -1
-
         self.__logger.info(f"parameters: {parameters}")
+
 
         # PART 2 - BUSSINESS LOGIC
         try:

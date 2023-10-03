@@ -3,15 +3,20 @@
 Remove it under your own responsibility.
 """
 import glob
-import shutil
 import sys
 from pathlib import Path
 
 import pytest
+from pyspark import Row
 from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, StringType
+
+from exampleenginepythonqiyhbwvw.common import constants as c
+from exampleenginepythonqiyhbwvw.business_logic.business_logic import BusinessLogic
+from exampleenginepythonqiyhbwvw.io.init_values import InitValues
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 def spark_test():
     """Execute the module setup and initialize the SparkSession.
 
@@ -44,14 +49,66 @@ def spark_test():
     spark.stop()
 
 
-@pytest.fixture(autouse=True)
-def cleanup_output_files():
-    """Cleanup output files after each test.
+@pytest.fixture(scope="function", autouse=True)
+def business_logic():
+    yield BusinessLogic()
 
-    Yields:
-        None
-    """
-    yield
-    output_path = 'resources/output'
-    if Path(output_path).exists():
-        shutil.rmtree(output_path)
+
+@pytest.fixture(scope="function", autouse=True)
+def init_values():
+    yield InitValues()
+
+
+@pytest.fixture(scope="function", autouse=True)
+def clients_df(init_values):
+    parameters_clients = {
+        'clients_path': 'resources/data/input/clients.csv',
+        'clients_schema': 'resources/schemas/clients_schema.json'}
+    yield init_values.get_input_df(parameters_clients, c.CLIENTS_PATH, c.CLIENTS_SCHEMA)
+
+
+@pytest.fixture(scope="function", autouse=True)
+def contracts_df(init_values):
+    parameters_clients = {
+        'contracts_path': 'resources/data/input/contracts.csv',
+        'contracts_schema': 'resources/schemas/contracts_schema.json'}
+    yield init_values.get_input_df(parameters_clients, c.CONTRACTS_PATH, c.CONTRACTS_SCHEMA)
+
+
+@pytest.fixture(scope="function", autouse=True)
+def products_df(init_values):
+    parameters_clients = {
+        'products_path': 'resources/data/input/products.csv',
+        'products_schema': 'resources/schemas/products_schema.json'}
+    yield init_values.get_input_df(parameters_clients, c.PRODUCTS_PATH, c.PRODUCTS_SCHEMA)
+
+
+@pytest.fixture(scope="function", autouse=True)
+def clients_dummy_df(spark_test):
+    data = [Row("111"), Row("111"), Row("111"), Row("111"), Row("123"), Row("123"), Row("444"), Row("555"), Row("777")]
+    schema = StructType([
+        StructField("cod_client", StringType())
+    ])
+
+    yield spark_test.createDataFrame(data, schema)
+
+
+@pytest.fixture(scope="function", autouse=True)
+def contracts_dummy_df(spark_test):
+    data = [Row("111", "aaa"), Row("123", "bbb")]
+    schema = StructType([
+        StructField("cod_titular", StringType()),
+        StructField("cod_producto", StringType())
+    ])
+
+    yield spark_test.createDataFrame(data, schema)
+
+
+@pytest.fixture(scope="function", autouse=True)
+def products_dummy_df(spark_test):
+    data = [Row("aaa"), Row("bbb")]
+    schema = StructType([
+        StructField("cod_producto", StringType())
+    ])
+
+    yield spark_test.createDataFrame(data, schema)

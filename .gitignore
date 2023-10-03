@@ -611,3 +611,7 @@ healthchecksdb
 
 # Backup folder for Package Reference Convert tool in Visual Studio 2017
 MigrationBackup/
+
+#run_testAT
+execute_testAT.py
+resources/data/output

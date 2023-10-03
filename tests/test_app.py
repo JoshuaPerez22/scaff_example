@@ -36,7 +36,7 @@ class TestApp(TestCase):
             with patch("exampleenginepythonqiyhbwvw.app.dataproc_dataflow"):
                 ret_code = app_main.main(runtimeContext)
         else:
-            with patch("exampleenginepythonqiyhbwvw.experiment.DataprocExperiment.run", return_value=None):
+            with patch("exampleenginepythonqiyhbwvw.app.DataprocExperiment"):
                 ret_code = app_main.main(runtimeContext)
 
         self.assertEqual(ret_code, 0)
@@ -67,7 +67,7 @@ class TestApp(TestCase):
             with patch("exampleenginepythonqiyhbwvw.app.dataproc_dataflow"):
                 ret_code = app_main.main(runtimeContext)
         else:
-            with patch("exampleenginepythonqiyhbwvw.experiment.DataprocExperiment.run", return_value=None):
+            with patch("exampleenginepythonqiyhbwvw.app.DataprocExperiment"):
                 ret_code = app_main.main(runtimeContext)
 
         self.assertEqual(ret_code, 0)

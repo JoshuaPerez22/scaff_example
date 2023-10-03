@@ -1,9 +1,5 @@
 import os
-from dataproc_sdk import DatioPysparkSession
-
 from exampleenginepythonqiyhbwvw.config import get_params_from_runtime
-from exampleenginepythonqiyhbwvw.io import init_values
-
 os.environ["ENMA_CONFIG_PATH"] = os.path.join(os.path.abspath(os.path.dirname(__file__)), ".sandbox")
 
 from py4j.java_gateway import JavaObject
@@ -36,6 +32,14 @@ class Main:
 
         try:
             config = runtimeContext.getConfig()
+            print(config)
+            self.__logger.info("Hola " + config.getString("params.devName") + " hoy es " + config.getString("params.date"))
+        except Exception as e:
+            self.__logger.error(e)
+            return -1
+
+        try:
+            config = runtimeContext.getConfig()
             if not config.isEmpty():
                 root_key = "EnvironmentVarsPM"
                 parameters = get_params_from_runtime(runtimeContext, root_key)
@@ -43,7 +47,6 @@ class Main:
             self.__logger.error(e)
             return -1
         self.__logger.info(f"parameters: {parameters}")
-
 
         # PART 2 - BUSSINESS LOGIC
         try:

@@ -37,23 +37,6 @@ class DataprocExperiment:
         clients_df, contracts_df, products_df, output_file, output_schema =\
             io.initialize_inputs(parameters)
 
-        clients_df.show()
-        clients_df.printSchema()
-        print("COUNT", clients_df.count())
-
-        clients_df.limit(2)
-
-        print("COLLECT", clients_df.collect())
-        print("HEAD", clients_df.head())
-        print("TAKE", clients_df.take(5))
-        print("FIRST", clients_df.first())
-
-
-
-        sys.exit()
-        #clients_df = self.read_csv("clients", parameters)
-        #contracts_df = self.read_csv("contracts", parameters)
-        #products_df = self.read_csv("products", parameters)
 
         logic = BusinessLogic()
         filtered_clients_df: DataFrame = logic.filter_by_age_and_vip(clients_df)
@@ -67,19 +50,16 @@ class DataprocExperiment:
         final_df = hashed_df\
             .select(*list(set(hashed_df.columns).difference(drop_col)),
                     when(activo() == lit("false"), lit("false").cast(BooleanType())).otherwise(vip()).alias("vip"))\
-            .select(hashed_df.columns)\
-            .filter((vip() == "false") | (fec_alta() < "2013-01-01"))
-        final_df.show(20, False)
+            .select(hashed_df.columns)
 
-        #hashed_df.write.mode("append").parquet("resources/data/output/table_out")
-        #hashed_df.write.partitionBy("cod_producto", "activo").mode("overwrite").parquet("resources/data/output/table_out")
-        #final_df.write.mode("overwrite").option("partitionOverwriteMode", "dynamic")\
-            #.partitionBy("cod_producto", "activo").parquet(str(parameters["output"]))
+        final_df = hashed_df
+        final_df.show(20, False)
 
         self.__datio_pyspark_session.write().mode("overwrite")\
             .option("partitionOverwriteMode", "dynamic")\
             .partition_by(["cod_producto", "activo"])\
-            .datio_schema(output_schema).parquet(final_df, output_file)
+            .datio_schema(output_schema) \
+            .parquet(logic.select_all_columns(final_df).coalesce(1), output_file)
 
     """
     def read_csv(self, table_id, parameters):

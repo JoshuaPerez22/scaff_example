@@ -1,7 +1,7 @@
 from dataproc_sdk.dataproc_sdk_utils.logging import get_user_logger
 import pyspark.sql.functions as f
 from pyspark.sql import DataFrame, Window
-
+from pyspark.sql.types import StringType, DateType, BooleanType, IntegerType
 from exampleenginepythonqiyhbwvw.common import input as i, output as o
 from exampleenginepythonqiyhbwvw.common import constants as c
 
@@ -37,3 +37,21 @@ class BusinessLogic:
         self.__logger.info("Generating hash column")
         return df.select(*df.columns,
                          f.sha2(f.concat_ws(c.CONCAT_SEPARATOR, *df.columns), c.SHA_KEY).alias(o.hash.name))
+
+    def select_all_columns(self, df: DataFrame) -> DataFrame:
+        self.__logger.info("Selecting all columns")
+        return df.select(
+            o.cod_producto().cast(StringType()),
+            o.cod_iuc().cast(StringType()),
+            o.cod_titular().cast(StringType()),
+            o.fec_alta().cast(DateType()),
+            o.activo().cast(BooleanType()),
+            o.cod_client().cast(StringType()),
+            o.nombre().cast(StringType()),
+            o.edad().cast(IntegerType()),
+            o.provincia().cast(StringType()),
+            o.cod_postal().cast(IntegerType()),
+            o.vip().cast(BooleanType()),
+            o.desc_producto().cast(StringType()),
+            o.hash().cast(StringType())
+        )
